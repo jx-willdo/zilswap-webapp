@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { RouteConfig } from 'react-router-config';
 import { Redirect } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
+import TBMLayout from './layouts/TBMLayout';
 
 const routes: RouteConfig[] = [{
   path: '/pools',
@@ -31,6 +32,15 @@ const routes: RouteConfig[] = [{
     component: lazy(() => import('./views/ilo/Past'))
   }, {
     component: () => <Redirect to="/zilo/current"></Redirect>
+  }]
+},
+{
+  path: '/thebearmarket',
+  component: TBMLayout,
+  routes: [{
+    path: "/thebearmarket",
+    exact: true,
+    component: lazy(() => import('./views/nft'))
   }]
 },
 {

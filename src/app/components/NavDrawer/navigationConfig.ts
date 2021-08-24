@@ -20,6 +20,10 @@ const navigationConfig: NavigationOptions[] = [{
     href: "/zilo",
     icon: "Flame",
   }, {
+    title: "The Bear Market",
+    href: "/thebearmarket",
+    icon: "Flame",
+  }, {
     title: "Guide",
     href: "https://zilswap.gitbook.io/zilswap/",
     icon: "FileCopy",
