@@ -1,4 +1,5 @@
-import { AppBar, Box, Button, CircularProgress, Grid, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import { AppBar, Box, Button, CircularProgress, Grid, InputAdornment, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import CallMissedOutgoingIcon from '@material-ui/icons/CallMissedOutgoingRounded';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { bytes } from "@zilliqa-js/zilliqa";
 import { Text } from 'app/components';
@@ -14,6 +15,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ObservedTx } from "zilswap-sdk";
 import { Network } from "zilswap-sdk/lib/constants";
+import AddIcon from '@material-ui/icons/AddRounded';
+import RemoveIcon from '@material-ui/icons/RemoveRounded';
+import cls from "classnames";
 
 const useStyles = makeStyles((theme: AppTheme) => ({
     root: {
@@ -48,9 +52,19 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     },
     inputBox: {
         marginTop: theme.spacing(1),
-        width: 200,
+        border: "5px solid #FB6447",
+        borderRadius: "20px",
+        height: 80,
+        width: 300,
+        color: "#FB6447",
+        backgroundColor: "#FFFFFF",
         "& input": {
             padding: "17.5px 14px",
+            fontSize: "40px",
+            height: "0.5rem"
+        },
+        '&.Mui-focused': {
+            caretColor: "#FB6447",
         },
     },
     brand: {
@@ -82,10 +96,10 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         }
     },
     mintButton: {
-        marginTop: theme.spacing(4),
+        marginTop: theme.spacing(2),
         marginBottom: theme.spacing(4),
         height: 80,
-        width: 280,
+        width: 300,
         borderRadius: "20px",
         backgroundColor: "#FB6447",
         "& .MuiTypography-root": {
@@ -110,6 +124,20 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         minHeight: "100vh",
         borderBottom: "10px solid #FF5252"
     },
+    heroContainer: {
+        [theme.breakpoints.down('xs')]: {
+            flexDirection: "column-reverse"
+        }
+    },
+    heroText: {
+        color: "#511500",
+        fontSize: "36px",
+        lineHeight: "42px"
+    },
+    bearMarketText: {
+        fontSize: "48px",
+        lineHeight: "56px"
+    },
     aboutSection: {
         background: "#84C9FD",
         minHeight: "100vh",
@@ -124,6 +152,29 @@ const useStyles = makeStyles((theme: AppTheme) => ({
             color: '#511500',
             lineHeight: "32px"
         },
+    },
+    callMissedOutgoingIcon: {
+        color: "#D39367",
+        verticalAlign: "middle"
+    },
+    toggleQtyButton: {
+        backgroundColor: "#FB6447",
+        borderRadius: "0px",
+        padding: "4px 24px 4px 16px",
+        "&:hover": {
+            backgroundColor: "#FB6447"
+        },
+        height: 38
+    },
+    addButton: {
+        borderTopRightRadius: "20px"
+    },
+    subtractButton: {
+        borderBottomRightRadius: "20px",
+    },
+    toggleQtyIcon: {
+        color: "#FFFFFF",
+        fontSize: "32px!important"
     },
 }));
 
@@ -300,7 +351,17 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         ? "CONNECT"
         : isMinting
             ? "MINTING..."
-            : "MINT"
+            : "MINT";
+
+    const handleAddQty = () => {
+        setMintQty(mintQty + 1);
+    }
+
+    const handleSubtractQty = () => {
+        if (mintQty === 1) return;
+
+        setMintQty(mintQty - 1);
+    }
 
     return (
         <Box display="flex" flexDirection="column" className={classes.root}>
@@ -317,7 +378,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                             {/* Connect Wallet Button */}
                             <Grid>
-                                <Button className={classes.navButton} onClick={connectZilPay}>
+                                <Button className={classes.navButton} onClick={connectZilPay} disableFocusRipple>
                                     {isLoading 
                                         ? <CircularProgress size={18} className={classes.progress} />
                                         : <Text variant="h3" margin={1}>
@@ -330,28 +391,56 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                     </Toolbar>
                 </AppBar>
 
-                <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                    <Text variant="h2">Mint your bear:</Text>
+                <Box display="flex" justifyContent="center" className={classes.heroContainer}>
+                    {/* Bear goes here */}
+                    <Box>
+                        <Text>
+                            I am a bear
+                        </Text>
+                    </Box>
 
-                    <OutlinedInput
-                        className={classes.inputBox}
-                        placeholder={"1"}
-                        onChange={onInputChange}
-                        onBlur={onInputBlur}
-                        value={mintQty.toString()}
-                        type="number"
-                        inputProps={{ min: "1" }}
-                    />
+                    <Box display="flex" flexDirection="column" ml={2}>
+                        <Text variant="h1" className={classes.heroText}>
+                            The ONLY bears <br />
+                            you'll need to <br />
+                            get through this <br />
+                            <span className={classes.bearMarketText}>
+                                BEAR MARKET
+                                <CallMissedOutgoingIcon fontSize="inherit" className={classes.callMissedOutgoingIcon} />
+                            </span>
+                        </Text>
+                                    
+                        <Box mt={2.5} display="flex" flexDirection="column">
+                            <Text variant="h1" className={classes.heroText}>Mint your bear:</Text>
 
-                    <Button className={classes.mintButton} onClick={handleMint}>
-                        {isLoading
-                            ? <CircularProgress size={30} className={classes.progress} />
-                            : <Text variant="h1">
-                                {mintButtonContent}
-                            </Text>
-                        }
-                    </Button>
+                            <OutlinedInput
+                                className={classes.inputBox}
+                                placeholder={"1"}
+                                onChange={onInputChange}
+                                onBlur={onInputBlur}
+                                value={mintQty.toString()}
+                                type="number"
+                                inputProps={{ min: "1", style: { textAlign: 'center' }}}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <Box display="flex" flexDirection="column" justifyContent="space-between" style={{ height: 80 }}>
+                                            <Button onClick={handleAddQty} className={cls(classes.toggleQtyButton, classes.addButton)} endIcon={<AddIcon className={classes.toggleQtyIcon} />} disableRipple/>
+                                            <Button onClick={handleSubtractQty} className={cls(classes.toggleQtyButton, classes.subtractButton)} endIcon={<RemoveIcon className={classes.toggleQtyIcon} />} disableRipple/>
+                                        </Box>
+                                    </InputAdornment>
+                                    } 
+                                />
+                        </Box>
 
+                        <Button className={classes.mintButton} onClick={handleMint} disableFocusRipple>
+                            {isLoading
+                                ? <CircularProgress size={30} className={classes.progress} />
+                                : <Text variant="h1">
+                                    {mintButtonContent}
+                                </Text>
+                            }
+                        </Button>
+                    </Box>
                 </Box>
             </section>
 
