@@ -52,11 +52,11 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     },
     inputBox: {
         marginTop: theme.spacing(1),
-        border: "5px solid #FB6447",
+        border: "5px solid #FF5252",
         borderRadius: "20px",
         height: 80,
         width: 300,
-        color: "#FB6447",
+        color: "#FF5252",
         backgroundColor: "#FFFFFF",
         "& input": {
             padding: "17.5px 14px",
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
             height: "0.5rem"
         },
         '&.Mui-focused': {
-            caretColor: "#FB6447",
+            caretColor: "#FF5252",
         },
     },
     brand: {
@@ -101,13 +101,13 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         height: 80,
         width: 300,
         borderRadius: "20px",
-        backgroundColor: "#FB6447",
+        backgroundColor: "#FF5252",
         "& .MuiTypography-root": {
             fontSize: "40px",
             color: '#FFFFFF',
         },
         "&:hover": {
-            backgroundColor: "#FB6447"
+            backgroundColor: "#FF5252"
         },
     },
     progress: {
@@ -126,7 +126,8 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     },
     heroContainer: {
         [theme.breakpoints.down('xs')]: {
-            flexDirection: "column-reverse"
+            flexDirection: "column-reverse",
+            alignItems: "center"
         }
     },
     heroText: {
@@ -147,7 +148,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         minHeight: "100vh",
     },
     footer: {
-        background: "#FB6447",
+        background: "#FF5252",
         "& .MuiTypography-root": {
             color: '#511500',
             lineHeight: "32px"
@@ -158,11 +159,11 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         verticalAlign: "middle"
     },
     toggleQtyButton: {
-        backgroundColor: "#FB6447",
+        backgroundColor: "#FF5252",
         borderRadius: "0px",
         padding: "4px 24px 4px 16px",
         "&:hover": {
-            backgroundColor: "#FB6447"
+            backgroundColor: "#FF5252"
         },
         height: 38
     },
@@ -393,13 +394,13 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                 <Box display="flex" justifyContent="center" className={classes.heroContainer}>
                     {/* Bear goes here */}
-                    <Box>
-                        <Text>
-                            I am a bear
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                        <Text className={classes.heroText}>
+                            insert bear here
                         </Text>
                     </Box>
 
-                    <Box display="flex" flexDirection="column" ml={2}>
+                    <Box display="flex" flexDirection="column" ml={3}>
                         <Text variant="h1" className={classes.heroText}>
                             The ONLY bears <br />
                             you'll need to <br />
@@ -409,6 +410,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                                 <CallMissedOutgoingIcon fontSize="inherit" className={classes.callMissedOutgoingIcon} />
                             </span>
                         </Text>
+
                                     
                         <Box mt={2.5} display="flex" flexDirection="column">
                             <Text variant="h1" className={classes.heroText}>Mint your bear:</Text>
@@ -446,7 +448,13 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
             {/* About section */}
             <section id="about" className={classes.aboutSection}>
-
+                <Box display="flex" flexDirection="column">
+                    <Text variant="h1">WELCOME TO THE BEAR MARKET</Text>
+                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing id luctus aliquet. Dis in placerat id nullam praesent. 
+                        Pulvinar fringilla nam ut tincidunt vestibulum faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing 
+                        id luctus aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh.
+                    </Text>
+                </Box>
             </section>
 
             {/* FAQ section */}
