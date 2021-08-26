@@ -1,4 +1,5 @@
-import { AppBar, Box, Button, CircularProgress, Grid, InputAdornment, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import { AppBar, Box, Button, CircularProgress, Container, Grid, InputAdornment, List, ListItem, 
+    ListItemIcon, ListItemText, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
 import CallMissedOutgoingIcon from '@material-ui/icons/CallMissedOutgoingRounded';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { bytes } from "@zilliqa-js/zilliqa";
@@ -18,6 +19,7 @@ import { Network } from "zilswap-sdk/lib/constants";
 import AddIcon from '@material-ui/icons/AddRounded';
 import RemoveIcon from '@material-ui/icons/RemoveRounded';
 import cls from "classnames";
+import DoneOutlineIcon from '@material-ui/icons/DoneOutlineRounded';
 
 const useStyles = makeStyles((theme: AppTheme) => ({
     root: {
@@ -42,6 +44,10 @@ const useStyles = makeStyles((theme: AppTheme) => ({
                 paddingLeft: "48px",
                 paddingRight: "48px"
             }
+        },
+        "& .MuiListItemText-primary": {
+            fontSize: "20px",
+            lineHeight: "20px"
         }
     },
     actionButton: {
@@ -55,7 +61,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         border: "5px solid #FF5252",
         borderRadius: "20px",
         height: 80,
-        width: 300,
+        width: 250,
         color: "#FF5252",
         backgroundColor: "#FFFFFF",
         "& input": {
@@ -99,11 +105,11 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(4),
         height: 80,
-        width: 300,
+        width: 250,
         borderRadius: "20px",
         backgroundColor: "#FF5252",
         "& .MuiTypography-root": {
-            fontSize: "40px",
+            fontSize: "35px",
             color: '#FFFFFF',
         },
         "&:hover": {
@@ -132,7 +138,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     },
     heroText: {
         color: "#511500",
-        fontSize: "36px",
+        fontSize: "35px",
         lineHeight: "42px"
     },
     bearMarketText: {
@@ -142,6 +148,28 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     aboutSection: {
         background: "#84C9FD",
         minHeight: "100vh",
+    },
+    aboutContainer: {
+        paddingTop: theme.spacing(8),
+        paddingBottom: theme.spacing(8)
+    },
+    welcomeBox: {
+        backgroundColor: "#5B64E3",
+        borderRadius: "20px",
+        border: "5px solid rgba(222, 255, 255, 0.1)",
+        padding: theme.spacing(6, 10),
+        [theme.breakpoints.down('xs')]: {
+            padding: theme.spacing(6, 4),
+        }
+    },
+    reasonsBox: {
+        backgroundColor: "#FF5252",
+        borderRadius: "20px",
+        border: "5px solid rgba(222, 255, 255, 0.1)",
+        padding: theme.spacing(6, 10),
+        [theme.breakpoints.down('xs')]: {
+            padding: theme.spacing(6, 4),
+        }
     },
     faqSection: {
         background: "#00132F",
@@ -161,7 +189,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     toggleQtyButton: {
         backgroundColor: "#FF5252",
         borderRadius: "0px",
-        padding: "4px 24px 4px 16px",
+        padding: "4px 16px 4px 8px",
         "&:hover": {
             backgroundColor: "#FF5252"
         },
@@ -177,6 +205,42 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         color: "#FFFFFF",
         fontSize: "32px!important"
     },
+    aboutHeader: {
+        color: "#FFFFFF",
+        fontSize: "50px",
+        lineHeight: "52px",
+        marginBottom: theme.spacing(1.2)
+    },
+    aboutText: {
+        color: "#FFFFFF",
+        fontSize: "18px",
+        lineHeight: "28px"
+    },
+    aboutSubheader: {
+        color: "#FFFFFF",
+        fontSize: "26px",
+        lineHeight: "28px"
+    },
+    aboutSubtitle: {
+        color: "#FFFFFF",
+        fontSize: "16px",
+        lineHeight: "26px"
+    },
+    aboutDivider: {
+        marginLeft: theme.spacing(3),
+        marginRight: theme.spacing(3)
+    },
+    doneOutlineIcon: {
+        color: "#ADFF00"
+    },
+    luckyText: {
+        fontSize: "45px", 
+        color: "#511500", 
+        lineHeight: "50px"
+    },
+    orangeText: {
+        color: "#FF5252"
+    }
 }));
 
 const CONTRACT_ADDR = "0xb9f08643a228a226ffbce6f2297f5c5ced612491";
@@ -286,7 +350,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
             {
                 vname: "size",
                 type: "Uint32",
-                value: `${mintQty}`,
+                value: `${mintQty}`, // to be amended
             }
         ];
       
@@ -402,9 +466,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                     <Box display="flex" flexDirection="column" ml={3}>
                         <Text variant="h1" className={classes.heroText}>
-                            The ONLY bears <br />
+                            The ONLY bear <br />
                             you'll need to <br />
-                            get through this <br />
+                            get through a <br />
                             <span className={classes.bearMarketText}>
                                 BEAR MARKET
                                 <CallMissedOutgoingIcon fontSize="inherit" className={classes.callMissedOutgoingIcon} />
@@ -448,13 +512,75 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
             {/* About section */}
             <section id="about" className={classes.aboutSection}>
-                <Box display="flex" flexDirection="column">
-                    <Text variant="h1">WELCOME TO THE BEAR MARKET</Text>
-                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing id luctus aliquet. Dis in placerat id nullam praesent. 
-                        Pulvinar fringilla nam ut tincidunt vestibulum faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing 
-                        id luctus aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh.
+                <Container maxWidth="md" className={classes.aboutContainer}>
+                    {/* The Bear Market */}
+                    <Box display="flex" flexDirection="column" className={classes.welcomeBox}>
+                        <Text variant="h1" className={classes.aboutHeader}>THE BEAR MARKET</Text>
+
+                        <Text className={classes.aboutText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing id luctus aliquet. Dis in placerat id nullam praesent. 
+                            Pulvinar fringilla nam ut tincidunt vestibulum faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing 
+                            id luctus aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh.
+                        </Text>
+
+                        <Text variant="h1" className={classes.aboutHeader} marginTop={2.5}>ADOPTION FEE: 2,500 ZIL</Text>
+
+                        <Text className={classes.aboutSubheader}>Maximum bears in a bear market: 10,000</Text>
+
+                        <Text className={classes.aboutSubtitle} marginTop={0.5}>
+                            Marketplace: 9,800 
+                            <span className={classes.aboutDivider}>|</span>
+                            Giveaway: 200
+                        </Text>
+                    </Box>
+                    
+                    {/* Even more reasons */}
+                    <Box mt={5} display="flex" flexDirection="column" className={classes.reasonsBox}>
+                        <Text variant="h1" className={classes.aboutHeader}>EVEN MORE REASONS</Text>
+
+                        <List>
+                            <ListItem>
+                                <ListItemIcon>
+                                    <DoneOutlineIcon className={classes.doneOutlineIcon} />
+                                </ListItemIcon>
+                                <ListItemText primary="hello world" />
+                            </ListItem>
+
+                            <ListItem>
+                                <ListItemIcon>
+                                    <DoneOutlineIcon className={classes.doneOutlineIcon} />
+                                </ListItemIcon>
+                                <ListItemText primary="hello world" />
+                            </ListItem>
+
+                            <ListItem>
+                                <ListItemIcon>
+                                    <DoneOutlineIcon className={classes.doneOutlineIcon} />
+                                </ListItemIcon>
+                                <ListItemText primary="hello world" />
+                            </ListItem>
+                            
+                            <ListItem>
+                                <ListItemIcon>
+                                    <DoneOutlineIcon className={classes.doneOutlineIcon} />
+                                </ListItemIcon>
+                                <ListItemText primary="hello world" />
+                            </ListItem>
+
+                            <ListItem>
+                                <ListItemIcon>
+                                    <DoneOutlineIcon className={classes.doneOutlineIcon} />
+                                </ListItemIcon>
+                                <ListItemText primary="hello world" />
+                            </ListItem>
+                        </List>
+                    </Box>
+
+                    <Text marginTop={10} marginBottom={10} className={classes.luckyText} align="center">AND IF YOU’RE <span className={classes.orangeText}>{"$(!*#&^{@)!!@[**#!"}</span> LUCKY...</Text>
+
+                    <Text className={classes.heroText} align="center">
+                        insert gummy bear here
                     </Text>
-                </Box>
+                </Container>
             </section>
 
             {/* FAQ section */}
