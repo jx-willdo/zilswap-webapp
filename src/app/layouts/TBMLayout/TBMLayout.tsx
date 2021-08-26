@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/styles";
 import { AppTheme } from "app/theme/types";
 import React, { Suspense } from "react";
 import { renderRoutes } from "react-router-config";
+import WalletDialog from "../WalletDialog";
 
 const useStyles = makeStyles((theme: AppTheme) => ({
   root: {
@@ -34,6 +35,7 @@ const TBMLayout: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) =
           {renderRoutes(route.routes)}
         </Suspense>
       </main>
+      <WalletDialog />
     </Box>
   );
 };

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Paaji+2:wght@700&display=swap');
 @import '~react-perfect-scrollbar/dist/css/styles.css';
 @import './prismjs';
 
@@ -13,7 +14,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   min-width: 320px;
   display: flex;
   flex-direction: column;
@@ -23,7 +26,7 @@ html, body, #root {
 
 a {
   text-decoration: none;
-  color: #00FFB0;
+  color: #00ffb0;
 }
 
 :not(pre) > code {
