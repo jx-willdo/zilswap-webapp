@@ -1,10 +1,12 @@
 import { AppBar, Box, Button, CircularProgress, Grid, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { bytes } from "@zilliqa-js/zilliqa";
-import { FancyButton, Text } from 'app/components';
+import { Text } from 'app/components';
 import { actions } from "app/store";
 import { RootState } from "app/store/types";
 import { AppTheme } from "app/theme/types";
 import { truncate, useAsyncTask, useNetwork, useTaskSubscriber } from "app/utils";
+import { LoadingKeys } from "app/utils/constants";
 import { logger } from "core/utilities";
 import { ConnectedWallet, ConnectWalletResult, connectWalletZilPay } from "core/wallet";
 import { BN, ZilswapConnector } from 'core/zilswap';
@@ -12,8 +14,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ObservedTx } from "zilswap-sdk";
 import { Network } from "zilswap-sdk/lib/constants";
-import { LoadingKeys } from "app/utils/constants";
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const useStyles = makeStyles((theme: AppTheme) => ({
     root: {
@@ -81,6 +81,21 @@ const useStyles = makeStyles((theme: AppTheme) => ({
             display: "none"
         }
     },
+    mintButton: {
+        marginTop: theme.spacing(4),
+        marginBottom: theme.spacing(4),
+        height: 80,
+        width: 280,
+        borderRadius: "20px",
+        backgroundColor: "#FB6447",
+        "& .MuiTypography-root": {
+            fontSize: "40px",
+            color: '#FFFFFF',
+        },
+        "&:hover": {
+            backgroundColor: "#FB6447"
+        },
+    },
     progress: {
         color: "#FFFFFF",
     },
@@ -93,6 +108,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     heroSection: {
         background: "#FCCC14",
         minHeight: "100vh",
+        borderBottom: "10px solid #FF5252"
     },
     aboutSection: {
         background: "#84C9FD",
@@ -121,7 +137,6 @@ const CHAIN_ID = {
 const msgVersion = 1; // current msgVersion
 
 const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => {
-    const { children, className } = props;
     const classes = useStyles();
     const wallet = useSelector<RootState, ConnectedWallet | null>(state => state.wallet.wallet);
     const [mintQty, setMintQty] = useState<number>(1);
@@ -142,12 +157,17 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         }
     }
 
-    const onMint = () => {
+    const handleMint = () => {
+        if (!wallet) {
+            connectZilPay();
+            return;
+        }
+
         runMint(async () => {
             if (mintQty === 1) {
-                mint();
+                await mint();
             } else {
-                batchMint();
+                await batchMint();
             }
         });
     }
@@ -269,12 +289,18 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         });
     }
 
-    const buttonContent = !!wallet 
+    const navButtonContent = !!wallet 
         ? <span>
             <FiberManualRecordIcon className={classes.dotIcon}/>
             {truncate(wallet!.addressInfo.bech32, 6, 4)}
         </span>
         : "CONNECT";
+
+    const mintButtonContent = !wallet
+        ? "CONNECT"
+        : isMinting
+            ? "MINTING..."
+            : "MINT"
 
     return (
         <Box display="flex" flexDirection="column" className={classes.root}>
@@ -295,7 +321,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                                     {isLoading 
                                         ? <CircularProgress size={18} className={classes.progress} />
                                         : <Text variant="h3" margin={1}>
-                                            {buttonContent}
+                                            {navButtonContent}
                                         </Text>
                                     }
                                 </Button>
@@ -317,14 +343,15 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                         inputProps={{ min: "1" }}
                     />
 
-                    <FancyButton
-                        walletRequired
-                        className={classes.actionButton}
-                        variant="contained"
-                        color="primary"
-                        onClick={onMint}>
-                        {isMinting ? "MINTING..." : "MINT"}
-                    </FancyButton>
+                    <Button className={classes.mintButton} onClick={handleMint}>
+                        {isLoading
+                            ? <CircularProgress size={30} className={classes.progress} />
+                            : <Text variant="h1">
+                                {mintButtonContent}
+                            </Text>
+                        }
+                    </Button>
+
                 </Box>
             </section>
 
