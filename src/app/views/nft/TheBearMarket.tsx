@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ObservedTx } from "zilswap-sdk";
 import { Network } from "zilswap-sdk/lib/constants";
+import bearSvg from "./asset/hero-bear.svg"
 
 const useStyles = makeStyles((theme: AppTheme) => ({
     root: {
@@ -130,7 +131,9 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     heroSection: {
         background: "#FCCC14",
         minHeight: "100vh",
-        borderBottom: "10px solid #FF5252"
+        borderBottom: "10px solid #FF5252",
+        display: "flex",
+        flexDirection: "column"
     },
     heroContainer: {
         [theme.breakpoints.down('xs')]: {
@@ -245,8 +248,8 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         color: "#ADFF00"
     },
     luckyText: {
-        fontSize: "45px", 
-        color: "#511500", 
+        fontSize: "45px",
+        color: "#511500",
         lineHeight: "50px",
         wordBreak: "break-word",
     },
@@ -312,6 +315,30 @@ const useStyles = makeStyles((theme: AppTheme) => ({
         color: "#FFFFFF",
         fontSize: "20px",
         lineHeight: "30px"
+    },
+    herobear: {
+        backgroundImage: `url(${bearSvg})`,
+        backgroundRepeat: "no-repeat",
+        height: 1000,
+        width: 1000,
+        backgroundPositionY: "100%",
+        backgroundSize: "contain",
+        [theme.breakpoints.down('lg')]: {
+            height: 900,
+            width: 900,
+        },
+        [theme.breakpoints.down('md')]: {
+            height: 700,
+            width: 700,
+        },
+        [theme.breakpoints.down('sm')]: {
+            height: 500,
+            width: 500,
+        },
+        [theme.breakpoints.down('xs')]: {
+            height: "40vh",
+            width: "40vh",
+        }
     }
 }));
 
@@ -348,7 +375,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
     const handleAccordionChange = (question: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
         setExpanded(isExpanded ? question : false);
-      };
+    };
 
     const handleMint = () => {
         if (!wallet) {
@@ -370,10 +397,10 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         const zilswap = ZilswapConnector.getSDK();
 
         if (!zilswap.zilliqa) throw new Error("Wallet not connected");
-      
+
         const chainId = CHAIN_ID[network];
         const minterContract = zilswap.getContract(CONTRACT_ADDR);
-      
+
         const address = wallet!.addressInfo.byte20;
 
         const args = [{
@@ -381,7 +408,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
             type: "ByStr20",
             value: `${address}`,
         }];
-      
+
         const minGasPrice = (await zilswap.zilliqa.blockchain.getMinimumGasPrice()).result as string;
         const params: any = {
             amount: new BN(1),
@@ -389,22 +416,22 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
             gasLimit: "5000",
             version: bytes.pack(chainId, msgVersion),
         };
-      
+
         const claimTx = await zilswap.callContract(minterContract, "Mint", args, params, true);
         logger("claim tx dispatched", claimTx.id);
-      
+
         if (claimTx.isRejected()) {
             throw new Error('Submitted transaction was rejected.')
         }
-      
+
         const observeTxn: ObservedTx = {
             hash: claimTx.id!,
             deadline: Number.MAX_SAFE_INTEGER,
         };
-      
+
         await zilswap.observeTx(observeTxn)
         console.log("mint observe tx: ", observeTxn);
-      
+
         return observeTxn;
     }
 
@@ -412,10 +439,10 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         const zilswap = ZilswapConnector.getSDK();
 
         if (!zilswap.zilliqa) throw new Error("Wallet not connected");
-      
+
         const chainId = CHAIN_ID[network];
         const minterContract = zilswap.getContract(CONTRACT_ADDR);
-      
+
         const address = wallet!.addressInfo.byte20;
 
         const args = [
@@ -430,7 +457,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                 value: `${mintQty}`, // to be amended
             }
         ];
-      
+
         const minGasPrice = (await zilswap.zilliqa.blockchain.getMinimumGasPrice()).result as string;
         const params: any = {
             amount: new BN(mintQty),
@@ -438,22 +465,22 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
             gasLimit: "5000",
             version: bytes.pack(chainId, msgVersion),
         };
-      
+
         const claimTx = await zilswap.callContract(minterContract, "BatchMint", args, params, true);
         logger("claim tx dispatched", claimTx.id);
-      
+
         if (claimTx.isRejected()) {
             throw new Error('Submitted transaction was rejected.')
         }
-      
+
         const observeTxn: ObservedTx = {
             hash: claimTx.id!,
             deadline: Number.MAX_SAFE_INTEGER,
         };
-      
+
         await zilswap.observeTx(observeTxn);
         console.log("batch mint observe tx: ", observeTxn);
-      
+
         return observeTxn;
     }
 
@@ -463,16 +490,16 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
             const zilPay = (window as any).zilPay;
             if (typeof zilPay === "undefined")
-            throw new Error("ZilPay extension not installed");
-    
+                throw new Error("ZilPay extension not installed");
+
             const result = await zilPay.wallet.connect();
             if (result !== zilPay.wallet.isConnect)
-            throw new Error("ZilPay could not be connected to.");
-    
+                throw new Error("ZilPay could not be connected to.");
+
             const walletResult: ConnectWalletResult = await connectWalletZilPay(zilPay);
             if (walletResult.error)
-            throw walletResult.error;
-    
+                throw walletResult.error;
+
             if (walletResult.wallet) {
                 const { wallet } = walletResult;
                 const { network } = wallet;
@@ -482,9 +509,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
         });
     }
 
-    const navButtonContent = !!wallet 
+    const navButtonContent = !!wallet
         ? <span>
-            <FiberManualRecordIcon className={classes.dotIcon}/>
+            <FiberManualRecordIcon className={classes.dotIcon} />
             {truncate(wallet!.addressInfo.bech32, 6, 4)}
         </span>
         : "CONNECT";
@@ -521,7 +548,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                             {/* Connect Wallet Button */}
                             <Grid>
                                 <Button className={classes.navButton} onClick={connectZilPay} disableFocusRipple>
-                                    {isLoading 
+                                    {isLoading
                                         ? <CircularProgress size={18} className={classes.progress} />
                                         : <Text variant="h3" margin={1}>
                                             {navButtonContent}
@@ -532,16 +559,12 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                         </Grid>
                     </Toolbar>
                 </AppBar>
-
+                <Box flexGrow={1} />
                 <Box display="flex" justifyContent="center" className={classes.heroContainer}>
                     {/* Bear goes here */}
-                    <Box display="flex" justifyContent="center" alignItems="center">
-                        <Text className={classes.heroText}>
-                            insert bear here
-                        </Text>
+                    <Box display="flex" className={classes.herobear} justifyContent="center" flexDirection="column" alignSelf="flex-end">
                     </Box>
-
-                    <Box display="flex" flexDirection="column" ml={3}>
+                    <Box display="flex" flexDirection="column" alignSelf="flex-end" ml={3}>
                         <Text variant="h1" className={classes.heroText}>
                             The ONLY bear <br />
                             you'll need to <br />
@@ -552,7 +575,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                             </span>
                         </Text>
 
-                                    
+
                         <Box mt={2.5} display="flex" flexDirection="column">
                             <Text variant="h1" className={classes.heroText}>Mint your bear:</Text>
 
@@ -563,16 +586,16 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                                 onBlur={onInputBlur}
                                 value={mintQty.toString()}
                                 type="number"
-                                inputProps={{ min: "1", style: { textAlign: 'center' }}}
+                                inputProps={{ min: "1", style: { textAlign: 'center' } }}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <Box display="flex" flexDirection="column" justifyContent="space-between" style={{ height: 80 }}>
-                                            <Button onClick={handleAddQty} className={cls(classes.toggleQtyButton, classes.addButton)} endIcon={<AddIcon className={classes.toggleQtyIcon} />} disableRipple/>
-                                            <Button onClick={handleSubtractQty} className={cls(classes.toggleQtyButton, classes.subtractButton)} endIcon={<RemoveIcon className={classes.toggleQtyIcon} />} disableRipple/>
+                                            <Button onClick={handleAddQty} className={cls(classes.toggleQtyButton, classes.addButton)} endIcon={<AddIcon className={classes.toggleQtyIcon} />} disableRipple />
+                                            <Button onClick={handleSubtractQty} className={cls(classes.toggleQtyButton, classes.subtractButton)} endIcon={<RemoveIcon className={classes.toggleQtyIcon} />} disableRipple />
                                         </Box>
                                     </InputAdornment>
-                                    } 
-                                />
+                                }
+                            />
                         </Box>
 
                         <Button className={classes.mintButton} onClick={handleMint} disableFocusRipple>
@@ -594,8 +617,8 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                     <Box display="flex" flexDirection="column" className={classes.welcomeBox}>
                         <Text variant="h1" className={classes.aboutHeader}>THE BEAR MARKET</Text>
 
-                        <Text className={classes.aboutText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing id luctus aliquet. Dis in placerat id nullam praesent. 
-                            Pulvinar fringilla nam ut tincidunt vestibulum faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing 
+                        <Text className={classes.aboutText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing id luctus aliquet. Dis in placerat id nullam praesent.
+                            Pulvinar fringilla nam ut tincidunt vestibulum faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh ac pretium. Scelerisque feugiat adipiscing
                             id luctus aliquet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra arcu nibh.
                         </Text>
 
@@ -604,12 +627,12 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                         <Text className={classes.aboutSubheader}>Maximum bears in a bear market: 10,000</Text>
 
                         <Text className={classes.aboutSubtitle} marginTop={0.5}>
-                            Marketplace: 9,800 
+                            Marketplace: 9,800
                             <span className={classes.aboutDivider}>|</span>
                             Giveaway: 200
                         </Text>
                     </Box>
-                    
+
                     {/* Even more reasons */}
                     <Box mt={5} display="flex" flexDirection="column" className={classes.reasonsBox}>
                         <Text variant="h1" className={classes.aboutHeader}>EVEN MORE REASONS</Text>
@@ -635,7 +658,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                                 </ListItemIcon>
                                 <ListItemText primary="hello world" />
                             </ListItem>
-                            
+
                             <ListItem>
                                 <ListItemIcon>
                                     <DoneOutlineIcon className={classes.doneOutlineIcon} />
@@ -651,7 +674,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                             </ListItem>
                         </List>
                     </Box>
-                            
+
                     <Text marginTop={10} marginBottom={10} className={classes.luckyText} align="center">AND IF YOU’RE <span className={classes.orangeText}>{"$(!*#&^{@)!!@[**#!"}</span> LUCKY...</Text>
 
                     {/* Legendary gummy bear */}
@@ -671,7 +694,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                         So what are you waiting for?
                     </Text>
                 </Box>
-            
+
                 <Box mt={-6} display="flex" justifyContent="center">
                     <Button className={classes.adoptButton}>
                         <Text className={classes.adoptButtonText}>
@@ -679,16 +702,16 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                         </Text>
                     </Button>
                 </Box>
-                
+
                 {/* FAQs */}
                 <Container maxWidth="md" className={classes.faqContainer}>
                     <Text align="center" marginBottom={3} style={{ color: "#FFFFFF", fontSize: "100px", lineHeight: "120px" }}>FAQs</Text>
-                    
+
                     <Accordion className={classes.accordion} expanded={expanded === 'question1'} onChange={handleAccordionChange('question1')}>
                         <AccordionSummary
-                        expandIcon={expanded === 'question1' ? <RemoveIcon /> : <AddIcon />}
+                            expandIcon={expanded === 'question1' ? <RemoveIcon /> : <AddIcon />}
                         >
-                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                            <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Text className={classes.answer}>
@@ -699,9 +722,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                     <Accordion className={classes.accordion} expanded={expanded === 'question2'} onChange={handleAccordionChange('question2')}>
                         <AccordionSummary
-                        expandIcon={expanded === 'question2' ? <RemoveIcon /> : <AddIcon />}
+                            expandIcon={expanded === 'question2' ? <RemoveIcon /> : <AddIcon />}
                         >
-                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                            <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Text className={classes.answer}>
@@ -712,9 +735,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                     <Accordion className={classes.accordion} expanded={expanded === 'question3'} onChange={handleAccordionChange('question3')}>
                         <AccordionSummary
-                        expandIcon={expanded === 'question3' ? <RemoveIcon /> : <AddIcon />}
+                            expandIcon={expanded === 'question3' ? <RemoveIcon /> : <AddIcon />}
                         >
-                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                            <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Text className={classes.answer}>
@@ -725,9 +748,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                     <Accordion className={classes.accordion} expanded={expanded === 'question4'} onChange={handleAccordionChange('question4')}>
                         <AccordionSummary
-                        expandIcon={expanded === 'question4' ? <RemoveIcon /> : <AddIcon />}
+                            expandIcon={expanded === 'question4' ? <RemoveIcon /> : <AddIcon />}
                         >
-                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                            <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Text className={classes.answer}>
@@ -738,9 +761,9 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
 
                     <Accordion className={classes.accordion} expanded={expanded === 'question5'} onChange={handleAccordionChange('question5')}>
                         <AccordionSummary
-                        expandIcon={expanded === 'question5' ? <RemoveIcon /> : <AddIcon />}
+                            expandIcon={expanded === 'question5' ? <RemoveIcon /> : <AddIcon />}
                         >
-                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                            <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
                         </AccordionSummary>
                         <AccordionDetails>
                             <Text className={classes.answer}>
