@@ -1,7 +1,12 @@
-import { AppBar, Box, Button, CircularProgress, Container, Grid, InputAdornment, List, ListItem, 
-    ListItemIcon, ListItemText, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import { AppBar, Box, Button, CircularProgress, Container, Grid, InputAdornment, List, ListItem, ListItemIcon, ListItemText, makeStyles, OutlinedInput, Toolbar } from "@material-ui/core";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AddIcon from '@material-ui/icons/AddRounded';
 import CallMissedOutgoingIcon from '@material-ui/icons/CallMissedOutgoingRounded';
+import DoneOutlineIcon from '@material-ui/icons/DoneOutlineRounded';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import RemoveIcon from '@material-ui/icons/RemoveRounded';
 import { bytes } from "@zilliqa-js/zilliqa";
 import { Text } from 'app/components';
 import { actions } from "app/store";
@@ -9,6 +14,7 @@ import { RootState } from "app/store/types";
 import { AppTheme } from "app/theme/types";
 import { truncate, useAsyncTask, useNetwork, useTaskSubscriber } from "app/utils";
 import { LoadingKeys } from "app/utils/constants";
+import cls from "classnames";
 import { logger } from "core/utilities";
 import { ConnectedWallet, ConnectWalletResult, connectWalletZilPay } from "core/wallet";
 import { BN, ZilswapConnector } from 'core/zilswap';
@@ -16,10 +22,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ObservedTx } from "zilswap-sdk";
 import { Network } from "zilswap-sdk/lib/constants";
-import AddIcon from '@material-ui/icons/AddRounded';
-import RemoveIcon from '@material-ui/icons/RemoveRounded';
-import cls from "classnames";
-import DoneOutlineIcon from '@material-ui/icons/DoneOutlineRounded';
 
 const useStyles = makeStyles((theme: AppTheme) => ({
     root: {
@@ -171,9 +173,18 @@ const useStyles = makeStyles((theme: AppTheme) => ({
             padding: theme.spacing(6, 4),
         }
     },
+    gummyBearBox: {
+        backgroundColor: "#511500",
+        borderRadius: "20px",
+        height: 300
+    },
     faqSection: {
         background: "#00132F",
         minHeight: "100vh",
+    },
+    faqContainer: {
+        paddingTop: theme.spacing(6),
+        paddingBottom: theme.spacing(14)
     },
     footer: {
         background: "#FF5252",
@@ -236,10 +247,71 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     luckyText: {
         fontSize: "45px", 
         color: "#511500", 
-        lineHeight: "50px"
+        lineHeight: "50px",
+        wordBreak: "break-word",
     },
     orangeText: {
         color: "#FF5252"
+    },
+    adoptBanner: {
+        backgroundColor: "#FF5252",
+        padding: theme.spacing(6)
+    },
+    adoptBannerText: {
+        color: "#511500",
+        fontSize: "50px",
+        lineHeight: "70px"
+    },
+    adoptButton: {
+        backgroundColor: "#511500",
+        height: 130,
+        width: 350,
+        borderRadius: "35px",
+        border: "20px solid #FF5252",
+        "&:hover": {
+            backgroundColor: "#511500"
+        }
+    },
+    adoptButtonText: {
+        color: "#FFFFFF",
+        fontSize: "35px",
+        lineHeight: "50px",
+    },
+    accordion: {
+        boxShadow: "none",
+        borderRadius: "30px!important",
+        backgroundColor: "rgba(91, 100, 227, 0.5)",
+        "& .MuiSvgIcon-root": {
+            fontSize: "35px",
+            color: "rgba(222, 255, 255, 0.5)"
+        },
+        "& .MuiAccordionSummary-root": {
+            padding: theme.spacing(2.5, 5),
+        },
+        "& .MuiAccordionSummary-expandIcon": {
+            transition: "none"
+        },
+        "& .MuiAccordionSummary-root.Mui-expanded": {
+            minHeight: "114px"
+        },
+        "& .MuiAccordionDetails-root": {
+            padding: theme.spacing(0, 5, 2.5),
+            display: "inherit"
+        },
+        "& .MuiAccordionSummary-content.Mui-expanded": {
+            margin: 0
+        },
+        marginBottom: theme.spacing(2)
+    },
+    question: {
+        color: "#FFFFFF",
+        fontSize: "35px",
+        lineHeight: "50px"
+    },
+    answer: {
+        color: "#FFFFFF",
+        fontSize: "20px",
+        lineHeight: "30px"
     }
 }));
 
@@ -256,6 +328,7 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
     const classes = useStyles();
     const wallet = useSelector<RootState, ConnectedWallet | null>(state => state.wallet.wallet);
     const [mintQty, setMintQty] = useState<number>(1);
+    const [expanded, setExpanded] = React.useState<string | false>(false);
     const [runMint, isMinting, error] = useAsyncTask("mint");
     const [runConnectTask, errorConnect] = useAsyncTask<void>("connectWalletZilPay");
     const [isLoading] = useTaskSubscriber(...LoadingKeys.connectWallet);
@@ -272,6 +345,10 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
             setMintQty(1);
         }
     }
+
+    const handleAccordionChange = (question: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+        setExpanded(isExpanded ? question : false);
+      };
 
     const handleMint = () => {
         if (!wallet) {
@@ -574,17 +651,104 @@ const TheBearMarket: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: an
                             </ListItem>
                         </List>
                     </Box>
-
+                            
                     <Text marginTop={10} marginBottom={10} className={classes.luckyText} align="center">AND IF YOU’RE <span className={classes.orangeText}>{"$(!*#&^{@)!!@[**#!"}</span> LUCKY...</Text>
 
-                    <Text className={classes.heroText} align="center">
-                        insert gummy bear here
-                    </Text>
+                    {/* Legendary gummy bear */}
+                    <Box display="flex" justifyContent="center" alignItems="center" mb={12} className={classes.gummyBearBox}>
+                        <Text variant="h1" align="center">
+                            insert gummy bear here
+                        </Text>
+                    </Box>
                 </Container>
             </section>
 
             {/* FAQ section */}
             <section id="faq" className={classes.faqSection}>
+                {/* Banner and button */}
+                <Box className={classes.adoptBanner}>
+                    <Text className={classes.adoptBannerText} align="center">
+                        So what are you waiting for?
+                    </Text>
+                </Box>
+            
+                <Box mt={-6} display="flex" justifyContent="center">
+                    <Button className={classes.adoptButton}>
+                        <Text className={classes.adoptButtonText}>
+                            ADOPT NOW
+                        </Text>
+                    </Button>
+                </Box>
+                
+                {/* FAQs */}
+                <Container maxWidth="md" className={classes.faqContainer}>
+                    <Text align="center" marginBottom={3} style={{ color: "#FFFFFF", fontSize: "100px", lineHeight: "120px" }}>FAQs</Text>
+                    
+                    <Accordion className={classes.accordion} expanded={expanded === 'question1'} onChange={handleAccordionChange('question1')}>
+                        <AccordionSummary
+                        expandIcon={expanded === 'question1' ? <RemoveIcon /> : <AddIcon />}
+                        >
+                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Text className={classes.answer}>
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, quas. Aliquid fugit maiores odit, quas soluta facere molestiae rem vitae dolores quibusdam quisquam asperiores voluptates dicta excepturi tempora, itaque neque?
+                            </Text>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className={classes.accordion} expanded={expanded === 'question2'} onChange={handleAccordionChange('question2')}>
+                        <AccordionSummary
+                        expandIcon={expanded === 'question2' ? <RemoveIcon /> : <AddIcon />}
+                        >
+                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Text className={classes.answer}>
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, quas. Aliquid fugit maiores odit, quas soluta facere molestiae rem vitae dolores quibusdam quisquam asperiores voluptates dicta excepturi tempora, itaque neque?
+                            </Text>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className={classes.accordion} expanded={expanded === 'question3'} onChange={handleAccordionChange('question3')}>
+                        <AccordionSummary
+                        expandIcon={expanded === 'question3' ? <RemoveIcon /> : <AddIcon />}
+                        >
+                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Text className={classes.answer}>
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, quas. Aliquid fugit maiores odit, quas soluta facere molestiae rem vitae dolores quibusdam quisquam asperiores voluptates dicta excepturi tempora, itaque neque?
+                            </Text>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className={classes.accordion} expanded={expanded === 'question4'} onChange={handleAccordionChange('question4')}>
+                        <AccordionSummary
+                        expandIcon={expanded === 'question4' ? <RemoveIcon /> : <AddIcon />}
+                        >
+                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Text className={classes.answer}>
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, quas. Aliquid fugit maiores odit, quas soluta facere molestiae rem vitae dolores quibusdam quisquam asperiores voluptates dicta excepturi tempora, itaque neque?
+                            </Text>
+                        </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion className={classes.accordion} expanded={expanded === 'question5'} onChange={handleAccordionChange('question5')}>
+                        <AccordionSummary
+                        expandIcon={expanded === 'question5' ? <RemoveIcon /> : <AddIcon />}
+                        >
+                        <Text className={classes.question}>HOW CAN I ADOPT A BEAR?</Text>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Text className={classes.answer}>
+                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Distinctio, quas. Aliquid fugit maiores odit, quas soluta facere molestiae rem vitae dolores quibusdam quisquam asperiores voluptates dicta excepturi tempora, itaque neque?
+                            </Text>
+                        </AccordionDetails>
+                    </Accordion>
+                </Container>
 
             </section>
 
