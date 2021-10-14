@@ -15,11 +15,17 @@ import LikedIcon from "@material-ui/icons/FavoriteRounded";
 import DotIcon from "@material-ui/icons/FiberManualRecordRounded";
 import { AppTheme } from "app/theme/types";
 import cls from "classnames";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ReactComponent as VerifiedBadge } from "../../verified-badge.svg";
 import { Nft } from "app/store/marketplace/types";
 import { toBech32Address } from "core/zilswap";
+import { useAsyncTask } from "app/utils";
+import { ArkClient } from "core/utilities";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, MarketPlaceState, OAuth, WalletState } from "app/store/types";
+import dayjs from "dayjs";
+import { actions } from "app/store";
 
 const useStyles = makeStyles((theme: AppTheme) => ({
   root: {
@@ -146,6 +152,35 @@ const NftCard: React.FC<Props> = (props: Props) => {
   const { className, token, collectionAddress, ...rest } = props;
   const classes = useStyles();
   const [liked, setLiked] = useState<boolean>(false);
+  const [runLikeToken] = useAsyncTask("likeToken");
+  const { oAuth } = useSelector<RootState, MarketPlaceState>((state) => state.marketplace);
+  const { wallet } = useSelector<RootState, WalletState>((state) => state.wallet);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (token) {
+      setLiked(!!token.isFavourited);
+    }
+  }, [token])
+
+  const likeToken = () => {
+    runLikeToken(async () => {
+      if (!wallet) return;
+      let newOAuth: OAuth | undefined = oAuth;
+      const arkClient = new ArkClient(wallet!.network)
+      if (!newOAuth?.access_token || (newOAuth?.expires_at && dayjs(newOAuth.expires_at * 1000).isBefore(dayjs()))) {
+        const { result } = await arkClient.arkLogin(wallet!, window.location.hostname);
+        dispatch(actions.MarketPlace.updateAccessToken(result));
+        newOAuth = result;
+      }
+      if (!liked) {
+        await arkClient.postFavourite(collectionAddress, token.tokenId, newOAuth!.access_token);
+      } else {
+        await arkClient.removeFavourite(collectionAddress, token.tokenId, newOAuth!.access_token);
+      }
+      setLiked(!liked);
+    })
+  }
 
   return (
     <Card {...rest} className={cls(classes.root, className)}>
@@ -163,7 +198,7 @@ const NftCard: React.FC<Props> = (props: Props) => {
           <Box display="flex" alignItems="center">
             <Typography className={classes.likes}>100K</Typography>
             <IconButton
-              onClick={() => setLiked(!liked)}
+              onClick={() => likeToken()}
               className={classes.likeIconButton}
               disableRipple
             >

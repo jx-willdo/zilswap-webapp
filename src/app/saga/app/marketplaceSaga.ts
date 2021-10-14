@@ -10,6 +10,7 @@ function* loadNftList() {
     yield put(actions.Layout.addBackgroundLoading("reloadNftList", "RELOAD_NFT_LIST"));
     const { network } = getBlockchain(yield select());
     const { filter } = getMarketplace(yield select());
+    const { wallet } = getWallet(yield select());
     const collectionAddress = filter.collectionAddress;
     logger("load nft list", "filter", filter);
 
@@ -35,6 +36,9 @@ function* loadNftList() {
     const query: ArkClient.SearchCollectionParams = {
       q: JSON.stringify({ traits }),
     };
+    if (wallet?.addressInfo.byte20) {
+      query.viewer = wallet?.addressInfo.byte20.toLocaleLowerCase()
+    }
 
     const arkClient = new ArkClient(network); // TODO: refactor client into redux
     const tokenResult = (yield call(arkClient.searchCollection, collectionAddress, query)) as unknown as any;
@@ -73,6 +77,7 @@ function* watchLoadNftList() {
   yield takeLatest([
     actions.MarketPlace.MarketPlaceActionTypes.RELOAD_TOKEN_LIST,
     actions.MarketPlace.MarketPlaceActionTypes.UPDATE_FILTER,
+    actions.Wallet.WalletActionTypes.WALLET_UPDATE,
   ], loadNftList);
 }
 

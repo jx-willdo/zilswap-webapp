@@ -43,6 +43,8 @@ export interface Nft {
   user?: MarketplaceUser;
   collection?: Collection;
   traitValues?: TraitValue[];
+  isFavourited?: boolean;
+  statistics?: SimpleMap<string>
 }
 
 export type TraitType = {
