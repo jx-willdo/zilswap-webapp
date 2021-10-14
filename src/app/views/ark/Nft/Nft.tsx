@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     display: "flex",
     width: "100%",
     flexDirection: "column",
-    padding: theme.spacing(8, 10),
+    padding: theme.spacing(8, 10, 8, 14),
     borderRadius: 12,
     border: "1px solid #29475A",
     background: "linear-gradient(173.54deg, #12222C 42.81%, #002A34 94.91%)",
@@ -153,14 +153,14 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     alignSelf: "center",
     right: "-70px",
     position: "relative",
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
 
       right: "0",
     }
   },
   imageInfoContainer: {
-    [theme.breakpoints.down("sm")]: {
+    [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
     }
   }
@@ -177,10 +177,6 @@ const NftView: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => 
   const [runGetNFTDetails] = useAsyncTask("runGetNFTDetails");
   const [bids, setBids] = useState<Cheque[]>([]);
   const [runGetBids] = useAsyncTask("getBids");
-  const [nftToken, setNftToken] = useState<Nft | null>(null);
-  const [trades, setTrades] = useState<any>()
-  const [runGetNftToken] = useAsyncTask("getNftToken");
-  const [runGetTokenTrade] = useAsyncTask("getTokenTrade");
   const collectionId = match.params.collection;
   const tokenId = match.params.id;
 
@@ -191,9 +187,6 @@ const NftView: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => 
       const address = fromBech32Address(collectionId).toLowerCase()
       const result = await arkClient.getNftToken(address, tokenId);
       setToken(result.result.model);
-      const { result: { model: { collection, tokenId: newId } } } = result;
-
-      getTokenTrade(collection.address, newId);
     })
     runGetBids(async () => {
       const address = fromBech32Address(collectionId).toLowerCase()
@@ -209,14 +202,6 @@ const NftView: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => 
   const isOwnToken = useMemo(() => {
     return token?.user?.address && wallet?.addressInfo.byte20?.toLowerCase() === token?.user?.address;
   }, [token, wallet?.addressInfo]);
-
-  const getTokenTrade = (collection: string, tokenId: number) => {
-    runGetTokenTrade(async () => {
-      const arkClient = new ArkClient(network);
-      const result = await arkClient.listTrade(collection, tokenId);
-      setTrades(result.result.entries);
-    })
-  }
 
   const breadcrumbs = [
     { path: "/ark/collections", value: "Collections" },
@@ -245,7 +230,7 @@ const NftView: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => 
 
         {/* Nft image and main info */}
         <Box display="flex" mt={3} justifyContent="center" className={classes.imageInfoContainer}>
-          <NftImage className={classes.bearImage} nftAsset={nftToken?.asset} />
+          <NftImage className={classes.bearImage} nftAsset={token?.asset} />
           <Box className={classes.mainInfoBox}>
             {/* Collection name */}
             <Typography className={classes.collectionName}>
@@ -289,12 +274,6 @@ const NftView: React.FC<React.HTMLAttributes<HTMLDivElement>> = (props: any) => 
         {/* Other info and price history */}
         <Box display="flex" mt={3}>
           {/* Other Info */}
-
-          {trades?.length > 0 && (
-            <>
-
-            </>
-          )}
           {/* Price History */}
         </Box>
       </Container>

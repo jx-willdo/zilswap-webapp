@@ -32,7 +32,6 @@ const apiPaths = {
   "token/list": "/nft/token/list",
   "trade/list": "/nft/trade/list",
   "trade/post": "/nft/trade/:address/:tokenId",
-  "trade/list": "/nft/trade/list",
   "user/list": "/user/list",
   "user/detail": "/user/:address/detail",
   "user/update": "/user/:address/update",
@@ -163,12 +162,6 @@ export class ArkClient {
     const result = await this.http.post({ url, data });
     return result.json();
   };
-
-  listTrade = async (collectionAddress: string, tokenId: number) => {
-    const url = this.http.path("trade/list", null, { collectionAddress, tokenId });
-    const result = await this.http.get({ url });
-    return result.json();
-  }
 
   /* ARK utils */
 
