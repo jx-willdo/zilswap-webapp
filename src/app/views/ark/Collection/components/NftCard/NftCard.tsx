@@ -144,7 +144,7 @@ const NftCard: React.FC<Props> = (props: Props) => {
 const useStyles = makeStyles((theme: AppTheme) => ({
   root: {
     width: "100%",
-    minWidth: "300px",
+    minWidth: "280px",
     borderRadius: 10,
     boxShadow: "none",
     backgroundColor: "transparent",
@@ -152,11 +152,13 @@ const useStyles = makeStyles((theme: AppTheme) => ({
     "& .MuiCardContent-root:last-child": {
       paddingBottom: theme.spacing(1.5),
     },
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "240px",
+    },
   },
   borderBox: {
-    border: `1px solid ${
-      theme.palette.type === "dark" ? "#29475A" : "rgba(0, 51, 64, 0.5)"
-    }`,
+    border: `1px solid ${theme.palette.type === "dark" ? "#29475A" : "rgba(0, 51, 64, 0.5)"
+      }`,
     borderRadius: 10,
     // border: "1px solid transparent",
     // backgroundImage:
