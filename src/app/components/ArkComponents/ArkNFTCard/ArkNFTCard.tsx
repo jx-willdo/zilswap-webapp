@@ -29,6 +29,8 @@ export interface Props extends CardProps {
   // tx href
 }
 
+const RETRY_TIMEOUT = [2000, 4000, 8000, 16000, 32000];
+
 const ArkNFTCard: React.FC<Props> = (props: Props) => {
   const { className, token, collectionAddress, dialog, ...rest } = props;
   const classes = useStyles();
@@ -93,7 +95,8 @@ const ArkNFTCard: React.FC<Props> = (props: Props) => {
       return `https://viewblock.io/zilliqa/address/${addr}?txsType=nft&specific=${token.tokenId}&network=testnet`;
     }
   }, [network, collectionAddress, token.tokenId]);
-  const setAsProfileImage = () => {
+
+  const setAsProfileImage = (tries?: number) => {
     runUpdateProfileImage(async () => {
       if (!token.asset?.url) {
         toaster("Invalid image url");
@@ -101,23 +104,36 @@ const ArkNFTCard: React.FC<Props> = (props: Props) => {
       }
 
       setPopAnchor(null);
-      const image = await fetch(token.asset.url, { method: "GET" })
-      const blobFile = await image.blob();
-      const arkClient = new ArkClient(wallet!.network)
-      let checkedOAuth: OAuth | undefined = oAuth;
-      if (!oAuth?.access_token || (oAuth && dayjs(oAuth?.expires_at * 1000).isBefore(dayjs()))) {
-        const { result } = await arkClient.arkLogin(wallet!, window.location.hostname);
-        dispatch(actions.MarketPlace.updateAccessToken(result));
-        checkedOAuth = result;
-      }
-      const address = wallet!.addressInfo.byte20.toLowerCase()
-      const requestResult = await arkClient.requestImageUploadUrl(address, checkedOAuth!.access_token);
+      try {
+        if (!tries || tries < 0) toaster(`Setting as profile image...`);
+        const image = await fetch(token.asset.url, { method: "GET" });
+        const blobFile = await image.blob();
+        const arkClient = new ArkClient(wallet!.network)
+        let checkedOAuth: OAuth | undefined = oAuth;
+        if (!oAuth?.access_token || (oAuth && dayjs(oAuth?.expires_at * 1000).isBefore(dayjs()))) {
+          const { result } = await arkClient.arkLogin(wallet!, window.location.hostname);
+          dispatch(actions.MarketPlace.updateAccessToken(result));
+          checkedOAuth = result;
+        }
+        const address = wallet!.addressInfo.byte20.toLowerCase()
+        const requestResult = await arkClient.requestImageUploadUrl(address, checkedOAuth!.access_token);
 
-      await arkClient.putImageUpload(requestResult.result.uploadUrl, blobFile);
-      await arkClient.notifyUpload(address, checkedOAuth!.access_token);
-      dispatch(actions.MarketPlace.loadProfile());
-      toaster(`Set ${token.tokenId} as profile image`);
+        await arkClient.putImageUpload(requestResult.result.uploadUrl, blobFile);
+        await arkClient.notifyUpload(address, checkedOAuth!.access_token);
+        dispatch(actions.MarketPlace.loadProfile());
+        toaster(`Set ${token.tokenId} as profile image`);
+      } catch (error) {
+        if (!tries && tries !== 0) tries = -1;
+        if (tries >= RETRY_TIMEOUT.length) throw error;
+        retrySetAsProfileImage(tries + 1);
+      }
     })
+  }
+
+  const retrySetAsProfileImage = (tries: number) => {
+    setTimeout(() => {
+      setAsProfileImage(tries);
+    }, RETRY_TIMEOUT[tries]);
   }
 
   const handlePopClick = (event: React.BaseSyntheticEvent) => {
@@ -307,8 +323,7 @@ const ArkNFTCard: React.FC<Props> = (props: Props) => {
                           <Typography className={classes.popperText}>Sell</Typography>
                         </Link>
                         <Box className={classes.divider} />
-                        <Typography onClick={setAsProfileImage} className={classes.popperText}>Set as profile picture</Typography>
-
+                        <Typography onClick={() => setAsProfileImage()} className={classes.popperText}>Set as profile picture</Typography>
                       </>
                     )}
                     <Box className={classes.divider} />
