@@ -148,7 +148,15 @@ const AcceptBidDialog: React.FC<Props> = (props: Props) => {
 
       const zilswap = ZilswapConnector.getSDK();
       const response = await zilswap.zilliqa.blockchain.getSmartContractSubState(collectionAddress, "operator_approvals");
-      const approvalState = response.result.operator_approvals;
+    
+      // if no operator_approvals, check for operators
+      let approvalState;
+      if (!response.result) {
+        const zrc6Response = await zilswap.zilliqa.blockchain.getSmartContractSubState(collectionAddress, "operators");
+        approvalState = zrc6Response.result.operators;
+      }else{
+        approvalState = response.result.operator_approvals;
+      }
       const userApprovals = approvalState?.[walletAddress];
       setTxApproved(!!userApprovals?.[arkClient.brokerAddress]);
     })
